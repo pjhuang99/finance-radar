@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选题雷达 · 财经商业热点</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Serif+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1208;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --accent: #c8371a;
+    --gold: #b8860b;
+    --muted: #7a6f5e;
+    --border: #c9bfaa;
+    --wb: #e8303a;
+    --xhs: #ff2442;
+    --rising: #1a7a4a;
+    --hot: #c8371a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Noto Serif SC', serif;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(180,160,120,0.12) 27px, rgba(180,160,120,0.12) 28px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 18px 40px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    position: relative;
+    background: var(--paper);
+    z-index: 1;
+  }
+
+  .masthead-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .masthead-title span {
+    color: var(--accent);
+  }
+
+  .masthead-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .masthead-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .banner {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 5px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    overflow: hidden;
+    z-index: 1;
+    position: relative;
+  }
+
+  .banner-label {
+    background: var(--accent);
+    padding: 2px 8px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .banner-ticker {
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+
+  .controls {
+    padding: 16px 40px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--paper);
+    z-index: 1;
+    position: relative;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    border: 1.5px solid var(--border);
+    background: transparent;
+    padding: 5px 16px;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 0.78rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+
+  .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .platform-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+
+  .refresh-btn {
+    margin-left: auto;
+    background: var(--accent);
+    border: none;
+    color: white;
+    padding: 6px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    cursor: pointer;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s;
+  }
+
+  .refresh-btn:hover { opacity: 0.85; }
+
+  .spin { animation: spin 1s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0;
+    min-height: calc(100vh - 160px);
+    position: relative;
+    z-index: 1;
+  }
+
+  .main-col {
+    border-right: 1px solid var(--border);
+    padding: 28px 40px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+
+  .section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .topics-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .topic-card {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 14px;
+    align-items: start;
+    padding: 14px 16px 14px 0;
+    border-bottom: 1px solid rgba(180,160,120,0.3);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+  }
+
+  .topic-card:hover { background: rgba(180,160,120,0.1); padding-left: 10px; margin-left: -10px; }
+  .topic-card.starred { background: rgba(184,134,11,0.06); }
+
+  .topic-rank {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--border);
+    line-height: 1;
+    text-align: right;
+  }
+
+  .topic-rank.top { color: var(--accent); }
+
+  .topic-body { min-width: 0; }
+
+  .topic-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .topic-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .platform-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    padding: 1px 6px;
+    border-radius: 1px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; }
+    .side-col { border-top: 1px solid var(--border); }
+    .masthead { padding: 14px 20px; }
+    .masthead-title { font-size: 1.8rem; }
+    .main-col { padding: 20px; }
+    .controls { padding: 12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-bar"></div>
+  <div class="loading-text">FETCHING TRENDS...</div>
+</div>
+
+<div class="masthead">
+  <div>
+    <div class="masthead-title">选题<span>雷达</span></div>
+    <div class="masthead-sub">Finance & Business · Content Intelligence</div>
+  </div>
+  <div class="masthead-meta">
+    <div id="currentTime">--:--:--</div>
+    <div id="currentDate">---- -- --</div>
+    <div>数据模拟演示版</div>
+  </div>
+</div>
+
+<div class="banner">
+  <span class="banner-label">▶ 实时</span>
+  <span class="banner-ticker" id="bannerTicker">正在加载热点数据...</span>
+</div>
+
+<div class="controls">
+  <button class="filter-btn active" onclick="filterPlatform('all', this)">全部来源</button>
+  <button class="filter-btn" onclick="filterPlatform('thepaper', this)">澎湃</button>
+  <button class="filter-btn" onclick="filterPlatform('huxiu', this)">虎嗅</button>
+  <button class="filter-btn" onclick="filterPlatform('36kr', this)">36氪</button>
+  <button class="filter-btn" onclick="filterPlatform('zhihu', this)">知乎</button>
+  <button class="filter-btn" onclick="filterPlatform('toutiao', this)">头条</button>
+  <button class="filter-btn" onclick="filterCategory('理财', this)">💰 理财</button>
+  <button class="filter-btn" onclick="filterCategory('宏观', this)">🌐 宏观</button>
+  <button class="filter-btn" onclick="filterCategory('科技股', this)">📡 科技股</button>
+  <button class="filter-btn" onclick="filterTrend('starred', this)">★ 收藏</button>
+  <button class="refresh-btn" onclick="refreshData()" id="refreshBtn">
+    <span id="refreshIcon">↻</span> 刷新数据
+  </button>
+</div>
+
+<div class="layout">
+  <div class="main-col">
+    <div class="notice">
+      ℹ️ <strong>演示模式</strong>：当前展示模拟数据。部署真实版本需配置数据采集服务（见下方技术说明）。数据每30分钟自动刷新一次。
+    </div>
+
+    <div class="section-header">
+      <div class="section-title">财经商业热点榜</div>
+      <div class="section-count" id="topicCount">-- 条话题</div>
+    </div>
+
+    <div class="topics-grid" id="topicsGrid">
+      <!-- 动态生成 -->
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div class="side-section">
+      <div class="stat-row" id="statsRow">
+        <div class="stat-box">
+          <div class="stat-num" id="statWb">--</div>
+          <div class="stat-label">微博热搜</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statXhs">--</div>
+          <div class="stat-label">小红书热门</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statRising">--</div>
+          <div class="stat-label">上升话题</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statStarred">--</div>
+          <div class="stat-label">已收藏</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        选题洞察
+        <span class="side-label">AI INSIGHT</span>
+      </div>
+      <div id="insightCards"></div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        热词云
+        <span class="side-label">KEYWORDS</span>
+      </div>
+      <div class="keyword-cloud" id="keywordCloud"></div>
+    </div>
+
+    <div class="side-section">
+      <div class="side-title">
+        我的选题池
+        <span class="side-label">WATCHLIST</span>
+      </div>
+      <div id="watchlist">
+        <div class="empty-watchlist">点击话题旁的 ☆ 加入选题池</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// ⚙️ 配置区
+// ============================================================
+const CONFIG = {
+  API_BASE: 'https://daily-hot-api-vercel-mu.vercel.app',
+
+  // 中文财经数据源（DailyHotApi）
+  SOURCES: [
+    { key: 'thepaper',    name: '澎湃',   color: '#1a1a1a' },
+    { key: 'sina-news',   name: '新浪',   color: '#cc0000' },
+    { key: 'netease-news',name: '网易',   color: '#e80000' },
+    { key: 'toutiao',     name: '头条',   color: '#e8253c' },
+    { key: 'zhihu',       name: '知乎',   color: '#0084ff' },
+    { key: 'huxiu',       name: '虎嗅',   color: '#f60' },
+    { key: '36kr',        name: '36氪',   color: '#00b350' },
+  ],
+
+
+  // 财经关键词（命中任意一个则保留）
+  FINANCE_KEYWORDS: [
+    '股','基金','ETF','理财','投资','经济','财经','金融','银行','债',
+    '楼市','房','汇率','人民币','美元','黄金','原油','大宗','通胀',
+    '降息','加息','货币','利率','贸易','关税','GDP','CPI','PMI',
+    '上市','IPO','并购','私募','券商','保险','央行','美联储',
+    '科技股','新能源','芯片','半导体','AI','产业链','供应链',
+    '消费','零售','出口','外资','A股','港股','纳斯达克','创业板',
+    '比亚迪','特斯拉','苹果','英伟达','阿里','腾讯','京东','华为',
+    '创业','融资','估值','独角兽','上市公司','国央企','营收','利润',
+    '通缩','滞胀','顺差','逆差','外储','汇改','降准','MLF','LPR',
+  ],
+
+  AUTO_REFRESH_MS: 30 * 60 * 1000,
+};
+
+// ============================================================
+// 离线备用数据
+// ============================================================
+const FALLBACK_TOPICS = [
+  { id:'f1',  title:"美联储暂停降息 人民币汇率承压 A股如何走", platform:"thepaper",  heat:9640000, trend:"hot",    category:"宏观" },
+  { id:'f2',  title:"DeepSeek冲击硅谷 中国AI估值逻辑重构",     platform:"huxiu",     heat:8920000, trend:"hot",    category:"科技股" },
+  { id:'f3',  title:"普通人2025年如何配置资产",                 platform:"zhihu",     heat:8310000, trend:"rising", category:"理财" },
+  { id:'f4',  title:"比亚迪销量破纪录 新能源产业链谁最受益",   platform:"36kr",      heat:7750000, trend:"rising", category:"新能源" },
+  { id:'f5',  title:"月薪1万如何开始投资 从零搭建个人资产表",  platform:"zhihu",     heat:7020000, trend:"new",    category:"理财" },
+  { id:'f6',  title:"房地产政策再加码 收储扩围 哪些城市先受益",platform:"thepaper",  heat:6580000, trend:"hot",    category:"地产" },
+  { id:'f7',  title:"黄金突破历史高点 还能追吗",               platform:"sina-news", heat:6130000, trend:"rising", category:"大宗商品" },
+  { id:'f8',  title:"芯片出口管制升级 国产替代谁直接受益",     platform:"toutiao",   heat:5290000, trend:"hot",    category:"科技股" },
+  { id:'f9',  title:"银行存款利率持续下行 钱放哪儿最划算",     platform:"zhihu",     heat:4980000, trend:"rising", category:"理财" },
+  { id:'f10', title:"港股通新规落地 南向资金会怎么流动",       platform:"thepaper",  heat:4510000, trend:"new",    category:"港股" },
+  { id:'f11', title:"ETF定投两年实录 本金20万现在多少",        platform:"zhihu",     heat:3580000, trend:"hot",    category:"基金" },
+  { id:'f12', title:"国央企并购潮 哪些细分赛道值得关注",       platform:"huxiu",     heat:3870000, trend:"new",    category:"并购" },
+  { id:'f13', title:"消费降级还是分级 2025零售行业真实现状",   platform:"36kr",      heat:3250000, trend:"rising", category:"消费" },
+  { id:'f14', title:"创业第一年踩了哪些坑 真实财务数据公开",   platform:"huxiu",     heat:4240000, trend:"rising", category:"创业" },
+  { id:'f15', title:"LPR再次下调 房贷月供减多少",              platform:"sina-news", heat:5100000, trend:"hot",    category:"地产" },
+];
+
+// ============================================================
+// 状态
+// ============================================================
+let state = {
+  topics: [],
+  starred: new Set(),
+  filter: { platform: 'all', trend: null, category: null },
+  activeKeyword: null,
+  dataSource: 'fallback',
+  lastUpdated: null,
+  sourceStats: {},  // { key: count }
+};
+
+// ============================================================
+// API 数据层
+// ============================================================
+function isFinanceTopic(title) {
+  return CONFIG.FINANCE_KEYWORDS.some(kw => title.includes(kw));
+}
+
+function inferCategory(title) {
+  const rules = [
+    { cat:'理财',    kws:['理财','投资','存款','利率','收益','定投','资产配置','LPR','MLF'] },
+    { cat:'基金',    kws:['基金','ETF','指数','公募','私募','净值'] },
+    { cat:'A股',     kws:['A股','沪深','上证','创业板','科创板','股市','大盘','牛市','熊市'] },
+    { cat:'宏观',    kws:['GDP','CPI','PMI','货币','央行','美联储','降息','加息','宏观','经济','贸易','关税','外储','顺差','逆差','通胀','通缩','降准'] },
+    { cat:'科技股',  kws:['芯片','半导体','AI','科技股','英伟达','纳斯达克','DeepSeek','算力','大模型'] },
+    { cat:'新能源',  kws:['新能源','比亚迪','特斯拉','电动','光伏','储能','锂电','碳中和'] },
+    { cat:'地产',    kws:['房','楼市','地产','房价','收储','二手房','按揭','公积金'] },
+    { cat:'大宗商品',kws:['黄金','原油','大宗','铜','铁矿','期货','能源'] },
+    { cat:'港股',    kws:['港股','恒生','南向','港交所','H股'] },
+    { cat:'创业',    kws:['创业','融资','估值','独角兽','VC','PE','天使轮'] },
+    { cat:'消费',    kws:['消费','零售','品牌','电商','出口','内需'] },
+    { cat:'并购',    kws:['并购','重组','收购','国央企','整合'] },
+  ];
+  for (const r of rules) {
+    if (r.kws.some(kw => title.includes(kw))) return r.cat;
+  }
+  return '财经';
+}
+
+function inferTrend(index, total) {
+  if (index < total * 0.25) return 'hot';
+  if (index < total * 0.6)  return 'rising';
+  return 'new';
+}
+
+function parseHeat(val) {
+  if (!val) return 0;
+  const s = val.toString().replace(/,/g, '');
+  const m = s.match(/([\d.]+)\s*(万|亿)?/);
+  if (!m) return 0;
+  let n = parseFloat(m[1]);
+  if (m[2] === '万') n *= 10000;
+  if (m[2] === '亿') n *= 100000000;
+  return Math.round(n);
+}
+
+// 拉取单个来源，返回标准化 topic 数组
+async function fetchSource(source) {
+  const res = await fetch(`${CONFIG.API_BASE}/${source.key}`, {
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  const items = json.data || json.list || [];
+  return items
+    .filter(item => {
+      const title = item.title || item.word || item.name || '';
+      return title && isFinanceTopic(title);
+    })
+    .map((item, i) => {
+      const title = (item.title || item.word || item.name || '').trim();
+      const total = items.length;
+      return {
+        id: `${source.key}_${i}`,
+        title,
+        platform: source.key,
+        platformName: source.name,
+        platformColor: source.color,
+        heat: parseHeat(item.hot || item.heat || item.index || (total - i)),
+        trend: inferTrend(i, total),
+        category: inferCategory(title),
+        url: item.url || item.mobileUrl || '',
+      };
+    });
+}
+
+// 并发拉取所有来源，合并去重，按热度排序
+async function fetchAllSources() {
+  const results = await Promise.allSettled(
+    CONFIG.SOURCES.map(s => fetchSource(s))
+  );
+
+  const sourceStats = {};
+  let all = [];
+
+  results.forEach((r, i) => {
+    const key = CONFIG.SOURCES[i].key;
+    if (r.status === 'fulfilled') {
+      sourceStats[key] = r.value.length;
+      all = all.concat(r.value);
+    } else {
+      sourceStats[key] = 0;
+      console.warn(`[${key}] 失败:`, r.reason?.message);
+    }
+  });
+
+  state.sourceStats = sourceStats;
+
+  // 标题去重（相似标题只保留热度最高的）
+  const seen = new Set();
+  const deduped = all.filter(t => {
+    const key = t.title.replace(/[^\u4e00-\u9fa5a-zA-Z]/g, '').slice(0, 10);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  // 按热度排序
+  return deduped.sort((a, b) => b.heat - a.heat);
+}
+
+async function loadTopics() {
+  try {
+    const topics = await fetchAllSources();
+    if (topics.length === 0) throw new Error('无财经相关数据');
+    state.dataSource = 'live';
+    state.lastUpdated = new Date();
+    return topics;
+  } catch (err) {
+    console.warn('[选题雷达] 数据加载失败，使用备用数据:', err.message);
+    state.dataSource = 'fallback';
+    return [...FALLBACK_TOPICS];
+  }
+}
+
+// ============================================================
+// 渲染
+// ============================================================
+function formatHeat(n) {
+  if (!n || n <= 0) return '—';
+  if (n >= 100000000) return (n/100000000).toFixed(1) + '亿';
+  if (n >= 10000000)  return (n/10000000).toFixed(1) + '千万';
+  if (n >= 10000)     return (n/10000).toFixed(0) + '万';
+  return n.toString();
+}
+
+function trendLabel(t) {
+  if (t === 'hot')    return '<span class="topic-trend trend-hot">🔥 热议</span>';
+  if (t === 'rising') return '<span class="topic-trend trend-up">⬆ 上升</span>';
+  if (t === 'new')    return '<span class="topic-trend trend-new">✦ 新上</span>';
+  return '';
+}
+
+function updateDataSourceBadge() {
+  const notice = document.querySelector('.notice');
+  if (!notice) return;
+  if (state.dataSource === 'live') {
+    const t = state.lastUpdated?.toLocaleTimeString('zh-CN') || '';
+    const successSources = CONFIG.SOURCES.filter(s => (state.sourceStats[s.key] || 0) > 0);
+    const sourceNames = successSources.map(s => `${s.name}(${state.sourceStats[s.key]})`).join(' · ');
+    notice.innerHTML = `✅ <strong>实时数据</strong> · 更新于 ${t} · 来源：${sourceNames}`;
+    notice.style.borderColor = 'var(--rising)';
+    notice.style.color = 'var(--rising)';
+  } else {
+    notice.innerHTML = `⚠️ <strong>备用数据</strong>：API 请求失败或无财经话题，当前显示内置示例数据。`;
+    notice.style.borderColor = 'var(--accent)';
+    notice.style.color = 'var(--muted)';
+  }
+}
+
+function getFilteredTopics() {
+  let topics = [...state.topics];
+  if (state.filter.platform !== 'all') {
+    topics = topics.filter(t => t.platform === state.filter.platform);
+  }
+  if (state.filter.category) {
+    topics = topics.filter(t => t.category === state.filter.category);
+  }
+  if (state.filter.trend === 'starred') {
+    topics = topics.filter(t => state.starred.has(t.id));
+  } else if (state.filter.trend) {
+    topics = topics.filter(t => t.trend === state.filter.trend);
+  }
+  if (state.activeKeyword) {
+    topics = topics.filter(t => t.category === state.activeKeyword || t.title.includes(state.activeKeyword));
+  }
+  return topics;
+}
+
+function renderTopics() {
+  const grid = document.getElementById('topicsGrid');
+  const topics = getFilteredTopics();
+
+  document.getElementById('topicCount').textContent = topics.length + ' 条财经话题';
+
+  const maxHeat = Math.max(...state.topics.map(t => t.heat), 1);
+
+  if (topics.length === 0) {
+    grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:0.85rem;">当前筛选条件下无匹配话题</div>';
+    updateStats();
+    return;
+  }
+
+  grid.innerHTML = topics.map((t, i) => {
+    const isStarred = state.starred.has(t.id);
+    const heatPct = Math.round((t.heat / maxHeat) * 100);
+    const isTop = i < 3;
+    const color = t.platformColor || '#888';
+    const ptag = `<span class="platform-tag" style="background:${color}18;color:${color};border:1px solid ${color}44">${t.platformName || t.platform}</span>`;
+    const titleEl = t.url
+      ? `<a href="${t.url}" target="_blank" style="color:inherit;text-decoration:none;" onclick="event.stopPropagation()">${t.title}</a>`
+      : t.title;
+
+    return `
+      <div class="topic-card ${isStarred ? 'starred' : ''}" style="animation-delay:${i*0.03}s">
+        <div class="topic-rank ${isTop ? 'top' : ''}">${String(i+1).padStart(2,'0')}</div>
+        <div class="topic-body">
+          <div class="topic-title">${titleEl}</div>
+          <div class="topic-meta">
+            ${ptag}
+            ${trendLabel(t.trend)}
+            <div class="heat-bar">
+              <div class="heat-track"><div class="heat-fill" style="width:${heatPct}%"></div></div>
+              ${formatHeat(t.heat)}
+            </div>
+          </div>
+        </div>
+        <div class="topic-actions" onclick="event.stopPropagation()">
+          <button class="star-btn ${isStarred ? 'active' : ''}" onclick="toggleStar('${t.id}')" title="${isStarred?'取消收藏':'加入选题池'}">
+            ${isStarred ? '★' : '☆'}
+          </button>
+          <div class="score-badge">${t.category}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateStats();
+
+}
+
+function buildDynamicKeywords() {
+  const freq = {};
+  state.topics.forEach(t => {
+    CONFIG.FINANCE_KEYWORDS.forEach(kw => {
+      if (kw.length >= 2 && t.title.includes(kw)) freq[kw] = (freq[kw] || 0) + 1;
+    });
+  });
+  return Object.entries(freq)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 16)
+    .map(([text, f], _, arr) => ({ text, hot: f >= arr[0][1] * 0.5 }));
+}
+
+function renderKeywords() {
+  const kws = buildDynamicKeywords();
+  const fallback = [
+    {text:"理财",hot:true},{text:"A股",hot:true},{text:"ETF",hot:true},
+    {text:"新能源",hot:false},{text:"黄金",hot:true},{text:"降息",hot:false},
+    {text:"创业",hot:false},{text:"AI",hot:true},{text:"港股",hot:false},
+    {text:"并购",hot:false},{text:"基金",hot:false},{text:"消费",hot:true},
+  ];
+  const list = kws.length >= 5 ? kws : fallback;
+  document.getElementById('keywordCloud').innerHTML = list.map(k => `
+    <span class="keyword-chip ${k.hot?'hot-keyword':''} ${state.activeKeyword===k.text?'active':''}"
+      onclick="toggleKeyword('${k.text}')">${k.text}</span>
+  `).join('');
+}
+
+function renderInsights() {
+  const insights = [];
+  const hot     = state.topics.filter(t => t.trend === 'hot').slice(0,1);
+  const rising  = state.topics.filter(t => t.trend === 'rising').slice(0,1);
+  const catCount = {};
+  state.topics.forEach(t => catCount[t.category] = (catCount[t.category]||0)+1);
+  const topCat  = Object.entries(catCount).sort((a,b)=>b[1]-a[1])[0];
+
+  if (hot[0])    insights.push({ label:'🔥 当前最热', text:`「${hot[0].title.slice(0,24)}」来自${hot[0].platformName || hot[0].platform}，是当前热度最高的财经话题，适合快速跟进解读。` });
+  if (rising[0]) insights.push({ label:'⬆ 上升趋势', text:`「${rising[0].title.slice(0,24)}」正快速上升，建议12小时内产出内容抢占流量窗口。` });
+  if (topCat)    insights.push({ label:'📊 赛道热度', text:`今日「${topCat[0]}」类财经话题共 ${topCat[1]} 条，是当前最活跃的内容赛道。` });
+
+  document.getElementById('insightCards').innerHTML = (insights.length ? insights : [{label:'提示', text:'暂无足够数据，请点击刷新。'}]).map(i => `
+    <div class="insight-card">
+      <div class="insight-label">${i.label}</div>
+      ${i.text}
+    </div>
+  `).join('');
+}
+
+function renderWatchlist() {
+  const wl = document.getElementById('watchlist');
+  const starred = state.topics.filter(t => state.starred.has(t.id));
+  if (!starred.length) {
+    wl.innerHTML = '<div class="empty-watchlist">点击话题旁的 ☆ 加入选题池</div>';
+    return;
+  }
+  wl.innerHTML = starred.map((t,i) => `
+    <div class="watchlist-item">
+      <span class="watchlist-num">${String(i+1).padStart(2,'0')}</span>
+      <span>${t.title.slice(0,22)}…</span>
+    </div>
+  `).join('');
+}
+
+function updateStats() {
+  // 统计各来源数量
+  document.getElementById('statWb').textContent  = (state.sourceStats['thepaper']||0) + (state.sourceStats['sina-news']||0);
+  document.getElementById('statXhs').textContent = (state.sourceStats['huxiu']||0) + (state.sourceStats['36kr']||0);
+  document.getElementById('statRising').textContent = state.topics.filter(t=>t.trend==='rising').length;
+  document.getElementById('statRising').textContent = state.topics.filter(t=>t.trend==='rising').length;
+  document.getElementById('statStarred').textContent = state.starred.size;
+  // 更新stat标签
+  document.querySelector('#statWb + .stat-label').textContent   = '媒体热点';
+  document.querySelector('#statXhs + .stat-label').textContent  = '商业资讯';
+}
+
+function updateBanner() {
+  const titles = state.topics.slice(0,8).map((t,i)=>`${i+1}. ${t.title}`).join('  ·  ');
+  document.getElementById('bannerTicker').textContent = titles || '正在加载财经热点...';
+}
+
+// ============================================================
+// 交互
+// ============================================================
+function toggleStar(id) {
+  if (state.starred.has(id)) state.starred.delete(id);
+  else state.starred.add(id);
+  renderTopics();
+  renderWatchlist();
+}
+
+function filterPlatform(platform, btn) {
+  state.filter.platform = platform;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    if (['全部来源','澎湃','虎嗅','36氪','知乎','头条','新浪'].some(n => b.textContent.trim()===n)) {
+      b.classList.remove('active');
+    }
+  });
+  btn.classList.add('active');
+  renderTopics();
+}
+
+function filterTrend(trend, btn) {
+  if (state.filter.trend === trend) {
+    state.filter.trend = null;
+    btn.classList.remove('active');
+  } else {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      if (b.onclick?.toString().includes('filterTrend')) b.classList.remove('active');
+    });
+    state.filter.trend = trend;
+    btn.classList.add('active');
+  }
+  renderTopics();
+}
+
+function toggleKeyword(kw) {
+  state.activeKeyword = state.activeKeyword === kw ? null : kw;
+  renderKeywords();
+  renderTopics();
+}
+
+async function refreshData() {
+  const btn = document.getElementById('refreshBtn');
+  const icon = document.getElementById('refreshIcon');
+  const overlay = document.getElementById('loadingOverlay');
+  btn.disabled = true;
+  icon.classList.add('spin');
+  overlay.classList.add('active');
+  state.topics = await loadTopics();
+  overlay.classList.remove('active');
+  btn.disabled = false;
+  icon.classList.remove('spin');
+  renderAll();
+}
+
+// ============================================================
+// 时钟 & 渲染入口
+// ============================================================
+function updateClock() {
+  const now = new Date();
+  document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN');
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'});
+}
+
+function renderAll() {
+  renderTopics();
+  renderInsights();
+  renderKeywords();
+  renderWatchlist();
+  updateBanner();
+  updateDataSourceBadge();
+}
+
+async function init() {
+  updateClock();
+  setInterval(updateClock, 1000);
+  const overlay = document.getElementById('loadingOverlay');
+  overlay.classList.add('active');
+  state.topics = await loadTopics();
+  overlay.classList.remove('active');
+  renderAll();
+  if (CONFIG.AUTO_REFRESH_MS > 0) {
+    setInterval(async () => { state.topics = await loadTopics(); renderAll(); }, CONFIG.AUTO_REFRESH_MS);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
